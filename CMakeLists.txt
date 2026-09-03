@@ -6,7 +6,9 @@ find_package(BISON)
 find_package(FLEX)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-add_definitions(-Du_int=unsigned -D__int64_t=int64_t -D__int32_t=int32_t -D__darwin_natural_t=unsigned -D__uint32_t=uint32_t -D__uint16_t=uint16_t -D__uint64_t=uint64_t -D_BSD_I386__TYPES_H_)
+if (NOT DARLING_HOST_MACOS)
+	add_definitions(-Du_int=unsigned -D__int64_t=int64_t -D__int32_t=int32_t -D__darwin_natural_t=unsigned -D__uint32_t=uint32_t -D__uint16_t=uint16_t -D__uint64_t=uint64_t -D_BSD_I386__TYPES_H_ -D_BSD_ARM__TYPES_H_ -D__arm64__=1)
+endif()
 add_definitions('-DMIG_VERSION="1.0"')
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/darling/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/darling/include/mach)
@@ -40,17 +42,16 @@ set(mig_sources
 add_executable(migcom ${mig_sources})
 
 add_custom_command(
-	#TARGET migcom
-	#POST_BUILD
-	#DEPENDS migcom
-	OUTPUT "${CMAKE_BINARY_DIR}/build-mig"
-	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/migcom.tproj/mig.sh"
-	COMMAND
-	awk -v "migcc=${CMAKE_C_COMPILER}"
-	-v "migcom=${CMAKE_CURRENT_BINARY_DIR}/migcom"
-	-f "${CMAKE_CURRENT_SOURCE_DIR}/darling/src/mig.awk"
-	"${CMAKE_CURRENT_SOURCE_DIR}/migcom.tproj/mig.sh" ">${CMAKE_BINARY_DIR}/build-mig"
-	&& chmod 0755 "${CMAKE_BINARY_DIR}/build-mig"
+	OUTPUT "/build-mig"
+	DEPENDS "/migcom.tproj/mig.sh"
+	COMMAND  -E env
+		awk
+		-v "migcc="
+		-v "migcom=/migcom"
+		-f "/darling/src/mig.awk"
+		"/migcom.tproj/mig.sh"
+		> "/build-mig"
+	COMMAND  -E env /bin/chmod 0755 "/build-mig"
 	)
 add_custom_target(migexe DEPENDS "${CMAKE_BINARY_DIR}/build-mig")
 
