@@ -42,16 +42,16 @@ set(mig_sources
 add_executable(migcom ${mig_sources})
 
 add_custom_command(
-	OUTPUT "/build-mig"
-	DEPENDS "/migcom.tproj/mig.sh"
-	COMMAND  -E env
+	OUTPUT "${CMAKE_BINARY_DIR}/build-mig"
+	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/migcom.tproj/mig.sh"
+	COMMAND ${CMAKE_COMMAND} -E env
 		awk
-		-v "migcc="
-		-v "migcom=/migcom"
-		-f "/darling/src/mig.awk"
-		"/migcom.tproj/mig.sh"
-		> "/build-mig"
-	COMMAND  -E env /bin/chmod 0755 "/build-mig"
+		-v "migcc=${CMAKE_C_COMPILER}"
+		-v "migcom=${CMAKE_CURRENT_BINARY_DIR}/migcom"
+		-f "${CMAKE_CURRENT_SOURCE_DIR}/darling/src/mig.awk"
+		"${CMAKE_CURRENT_SOURCE_DIR}/migcom.tproj/mig.sh"
+		> "${CMAKE_BINARY_DIR}/build-mig"
+	COMMAND ${CMAKE_COMMAND} -E env /bin/chmod 0755 "${CMAKE_BINARY_DIR}/build-mig"
 	)
 add_custom_target(migexe DEPENDS "${CMAKE_BINARY_DIR}/build-mig")
 
