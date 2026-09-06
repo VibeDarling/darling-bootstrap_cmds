@@ -7,7 +7,7 @@ find_package(FLEX)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 if (NOT DARLING_HOST_MACOS)
-	if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+	if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64" OR TARGET_ARM64)
 		add_definitions(-Du_int=unsigned -D__int64_t=int64_t -D__int32_t=int32_t -D__darwin_natural_t=unsigned -D__uint32_t=uint32_t -D__uint16_t=uint16_t -D__uint64_t=uint64_t -D_BSD_ARM__TYPES_H_ -D__arm64__=1)
 	else()
 		add_definitions(-Du_int=unsigned -D__int64_t=int64_t -D__int32_t=int32_t -D__darwin_natural_t=unsigned -D__uint32_t=uint32_t -D__uint16_t=uint16_t -D__uint64_t=uint64_t -D_BSD_I386__TYPES_H_)
